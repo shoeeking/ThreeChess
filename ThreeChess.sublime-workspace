@@ -1,0 +1,947 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"point",
+				"point"
+			],
+			[
+				"ban",
+				"banChess"
+			],
+			[
+				"ba",
+				"BAN"
+			],
+			[
+				"pLAYER",
+				"Player"
+			],
+			[
+				"for",
+				"for\tfor (…) {…}"
+			],
+			[
+				"f",
+				"for\tfor (…) {…} (Improved Native For-Loop)"
+			],
+			[
+				"b",
+				"bulletNodePoint"
+			],
+			[
+				"bu",
+				"bullet1"
+			],
+			[
+				"Player",
+				"mPlayer"
+			],
+			[
+				"pos",
+				"pos1"
+			],
+			[
+				"spee",
+				"speedV"
+			],
+			[
+				"sp",
+				"speedV"
+			],
+			[
+				"update",
+				"updateTouch"
+			],
+			[
+				"NODE",
+				"node"
+			],
+			[
+				"pLAN",
+				"PLANE_STATE"
+			],
+			[
+				"player",
+				"Player"
+			],
+			[
+				"Game",
+				"GAME_STATE"
+			],
+			[
+				"ques",
+				"questionId"
+			],
+			[
+				"qu",
+				"questionId"
+			],
+			[
+				"ti",
+				"Time"
+			],
+			[
+				"_X",
+				"_XRun"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "assets/Scripts/GameLayer.js",
+			"settings":
+			{
+				"buffer_size": 5444,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "\n//逻辑层\nlet GameLogic = cc.Class({\n    ctor(){\n        this.pointList = []\n        for(var i=0;i<3;i++){\n            for(var j=0;j<9;j++){\n                let point = {}\n                point.id = i*9+j\n                point.rectId = i\n                point.placeId = j\n                point.rowId = Math.floor(j/3)\n                point.columnId = Math.floor(j%3)\n                this.pointList[point.id] = point\n            }\n        }\n        this.chessList = []\n    },\n    getPoint(id){\n        return this.pointList[id]\n    },\n    getPoints(){\n        return this.pointList\n    },\n    put(id,chess){\n        this.chessList.push(chess)\n        this.pointList[id].chess = chess\n        chess.put(id)\n    },\n    move(id,chess){\n        this.pointList[chess.pointId].chess = null\n        this.pointList[id].chess = chess\n        chess.put(id)\n    },\n    remove(chess){\n        chess.die()\n        this.pointList[chess.pointId].chess = null\n    },\n    getChess(pointId){\n        let point = this.pointList[pointId]\n        if(!point){\n            console.log(\"坐标有问题，要查一查\",pointId)\n            return null\n        }\n        return point.chess\n    },\n    getThree(chess){\n        let threeList = []\n        let rowList = this.isRectRow(chess.pointId)\n        let columnList = this.isRectColumn(chess.pointId)\n        let pointList = this.isSamePoint(chess.pointId)\n        rowList && threeList.push(rowList)\n        columnList && threeList.push(columnList)\n        pointList && threeList.push(pointList)\n        return threeList\n    },\n    isOK(idList){\n        if(!idList || idList.length==0)return false\n        let chess = this.getChess(idList[0])\n        if(!chess)return false\n        for(var i=1;i<idList.length;i++){\n            let newChess = this.getChess(idList[i])\n            if(!newChess||!newChess.isOnePlayer(chess)){\n                return false\n            }\n        }\n        return true\n    },\n    isRectRow(id){\n        let point = this.getPoint(id)\n        let rId = point.rowId*3\n        let list = [rId,rId+1,rId+2]\n        if(this.isOK(list)){\n            return list\n        }\n        return null\n    },\n    isRectColumn(id){\n        let point = this.getPoint(id)\n        let cId = point.rectId*9 + point.columnId\n        let list = [cId,cId+3*1,cId+3*2]\n        if(this.isOK(list)){\n            return list\n        }\n        return null\n    },\n    isSamePoint(id){\n        let point = this.getPoint(id)\n        let pId = point.placeId\n        let exportId=[0,2,4,6,8]\n        if (exportId.indexOf(pId)>=0){\n            return null\n        }\n        let list = [pId,pId+9*1,pId+9*2]\n        if(this.isOK(list)){\n            return list\n        }\n        return null\n    },\n    canMove(chess,id){\n        //位置相同\n        if(chess.pointId==id)return false\n        //目标位置有棋子\n        if(this.getChess(id))return false\n\n        let point0 = this.getPoint(chess.pointId)\n        let point1 = this.getPoint(id)\n        // 同一个矩形内，只判断内部序号\n        if(point0.rectId==point1.rectId){\n            return Math.abs(point0.columnId-point1.columnId)+Math.abs(point0.rowId-point1.rowId)==1\n        }else if(Math.abs(point0.rectId-point1.rectId)==1){\n            let exportId=[0,2,4,6,8]\n            // 矩形角落不能跨层移动\n            if (exportId.indexOf(point0.id)>=0){\n                return false\n            }\n            return (point0.columnId==point1.columnId)&&(point0.rowId==point1.rowId)\n        }\n        return false\n    },\n    noWay(id){\n        let way={\n            0\n        }\n    },\n})\n\nmodule.exports = GameLogic\n",
+			"file": "assets/Scripts/GameLogic.js",
+			"file_size": 3724,
+			"file_write_time": 131772457651676892,
+			"settings":
+			{
+				"buffer_size": 3525,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "assets/Scripts/Player.js",
+			"settings":
+			{
+				"buffer_size": 1044,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "assets/Scripts/Chess.js",
+			"settings":
+			{
+				"buffer_size": 1283,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/Lua/Lua.sublime-build",
+					""
+				],
+				[
+					"Packages/User/XXEngine.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/User/XXEngine.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		],
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				],
+				[
+					"Packages/User/XXEngine.sublime-build",
+					""
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 302.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ip",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 392.0
+	},
+	"console":
+	{
+		"height": 62.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '6f4c264a24d933ce70df5dedcf1dcaee' + 'ebe013ee18cced0ef93d5f746d80ef60'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)",
+			"import urllib2,os; pf='Package Control.sublime-package'; ipp = sublime.installed_packages_path(); os.makedirs( ipp ) if not os.path.exists(ipp) else None; urllib2.install_opener( urllib2.build_opener( urllib2.ProxyHandler( ))); open( os.path.join( ipp, pf), 'wb' ).write( urllib2.urlopen( 'http://sublime.wbond.net/' +pf.replace( ' ','%20' )).read()); print( 'Please restart Sublime Text to finish installation')",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/E/Git/ThreeChess",
+		"/E/Git/ThreeChess/assets",
+		"/E/Git/ThreeChess/assets/Libs",
+		"/E/Git/ThreeChess/assets/Libs/wx",
+		"/E/Git/ThreeChess/assets/Scripts",
+		"/E/WorkSpace/code"
+	],
+	"file_history":
+	[
+		"/E/Git/ThreeChess/assets/Libs/Global.js",
+		"/E/Git/ThreeChess/assets/Libs/LayerManager.js",
+		"/E/Git/ThreeChess/assets/Scripts/Point.js",
+		"/E/Git/ThreeChess/assets/Libs/Utils.js",
+		"/E/Git/ThreeChess/assets/Scripts/GameLogic.js",
+		"/E/Git/ThreeChess/assets/Libs/wx/wxBridge.js",
+		"/E/Git/ThreeChess/assets/Scripts/MainLayer.js",
+		"/E/Git/ThreeChess/assets/Scripts/DefaulScript.js",
+		"/E/Git/ThreeChess/assets/Scripts/GameLayer.js",
+		"/E/Git/ThreeChess/ThreeChess.sublime-project",
+		"/E/Git/BeeWar/BeeWar.sublime-project",
+		"/E/Git/BeeWar/assets/script/MainView.js",
+		"/E/Git/BeeWar/assets/script/GameLogic.js",
+		"/E/Git/BeeWar/assets/script/GameOption.js",
+		"/E/Git/BeeWar/assets/script/mgr/GameManager.js",
+		"/E/Git/BeeWar/assets/script/components/Enemy.js",
+		"/E/Git/BeeWar/assets/script/components/Player.js",
+		"/E/Git/BeeWar/assets/script/GameOver.js",
+		"/E/Git/BeeWar/assets/script/GameUI.js",
+		"/E/Git/BeeWar/assets/script/DefaulScript.js",
+		"/C/Users/rwx/Desktop/wxGameRank-master/SubGame/assets/Script/GameRankingList.js",
+		"/C/Users/rwx/Desktop/wxGameRank-master/SubGame/assets/Script/GameOverRank.js",
+		"/E/Git/BeeWar/assets/script/RankingView.js",
+		"/E/Git/BeeWar/assets/script/GameControl.js",
+		"/C/Users/rwx/Desktop/wxGameRank-master/MainGame/assets/Script/RankingView.js",
+		"/E/CocosCreator/resources/engine/bin/.cache/wechatgame/cocos2d-js-min.js",
+		"/E/Git/BeeWar/assets/script/WXScript.js",
+		"/E/Git/BeeWar/assets/script/wx.js",
+		"/E/Git/BeeWar/assets/script/FlyScript.js",
+		"/E/Git/BeeWar/assets/script/util/wx.js",
+		"/E/Git/BeeWar/assets/script/components/BezierGraphics.js",
+		"/E/Git/BeeWar/assets/script/components/Joystick.js",
+		"/E/Git/BeeWar/assets/prefab/Joystick.prefab",
+		"/E/Git/BeeWar/assets/script/components/XButton.js",
+		"/E/Git/BeeWar/assets/script/components/Graphics.js",
+		"/E/CocosCreator/resources/engine/cocos2d/core/value-types/CCVec2.js",
+		"/E/Git/BeeWar/assets/script/components/Bullet.js",
+		"/E/WorkSpace/Examples/assets/cases/02_ui/13_toggle/checkbox.js",
+		"/E/WorkSpace/code/test1.js",
+		"/E/Git/BeeWar/assets/script/util/Constants.js",
+		"/E/Git/BeeWar/assets/script/GameManager.js",
+		"/E/Git/BeeWar/assets/script/Enemy.js",
+		"/E/Git/BeeWar/assets/script/AudioManage.js",
+		"/E/Git/BeeWar/assets/script/XButton.js",
+		"/E/Git/BeeWar/assets/script/CoreLogic.js",
+		"/E/Git/BeeWar/assets/script/Joystick.js",
+		"/E/Git/BeeWar/assets/script/Player.js",
+		"/E/Git/BeeWar/assets/script/Bullet.js",
+		"/E/GitHub/BeeWar/assets/script/util/Global.js",
+		"/E/GitHub/BeeWar/assets/default/DefaulScript.js",
+		"/E/GitHub/BeeWar/assets/script/Enemy.js",
+		"/E/GitHub/BeeWar/assets/script/GameManager.js",
+		"/E/GitHub/BeeWar/assets/script/CoreLogic.js",
+		"/E/GitHub/BeeWar/assets/script/XButton.js",
+		"/E/CocosCreator/resources/engine/cocos2d/core/CCScheduler.js",
+		"/E/GitHub/BeeWar/assets/script/Player.js",
+		"/E/GitHub/BeeWar/project.json",
+		"/E/GitHub/BeeWar/assets/script/GameWin.js",
+		"/E/GitHub/BeeWar/assets/script/GameOver.js",
+		"/E/GitHub/BeeWar/assets/script/Bullet.js",
+		"/E/GitHub/BeeWar/assets/script/AudioManage.js",
+		"/E/GitHub/BeeWar/assets/Test/TestScript.js",
+		"/E/GitHub/BeeWar/assets/script/util/Constants.js",
+		"/E/CocosCreator/resources/engine/cocos2d/core/CCNode.js",
+		"/E/CocosCreator/resources/engine/cocos2d/core/utils/base-node.js",
+		"/E/CocosCreator/resources/engine/cocos2d/core/component-scheduler.js",
+		"/E/GitHub/BeeWar/assets/table/formation.js",
+		"/E/GitHub/BeeWar/assets/Libs/Utils.js",
+		"/E/GitHub/BeeWar/assets/prefab/Bullet.prefab",
+		"/C/Users/rwx/AppData/Roaming/Sublime Text 3/Packages/User/JavaSript.sublime-build",
+		"/E/WorkSpace/tutorial-blackjack-master/assets/scripts/Game.js",
+		"/E/WorkSpace/tutorial-blackjack-master/assets/scripts/module/game-fsm.js",
+		"/E/WorkSpace/tutorial-blackjack-master/assets/scripts/ActorRenderer.js",
+		"/E/WorkSpace/tutorial-blackjack-master/assets/scripts/Card.js",
+		"/E/GitHub/BeeWar/BeeWar.sublime-project",
+		"/E/WorkSpace/BeeWar/assets/script/Player.js",
+		"/E/WorkSpace/CCCTest/assets/Script/Helloworld.ts",
+		"/E/WorkSpace/PIC/XXPIC.spec",
+		"/E/WorkSpace/PIC/config.ini",
+		"/E/WorkSpace/PIC/Title.py",
+		"/E/WorkSpace/PIC/XXPIC.py",
+		"/E/WorkSpace/PIC/PIC3.py",
+		"/E/WorkSpace/PIC/Copy.py",
+		"/E/WorkSpace/PIC/PIC4.py",
+		"/E/WorkSpace/PIC/PIC.py",
+		"/E/WorkSpace/PIC/PIC3",
+		"/E/WorkSpace/zhihu-python-master/auth.py",
+		"/E/WorkSpace/zhihu-python-master/config.ini",
+		"/E/WorkSpace/PIC/PIC2.py",
+		"/E/WorkSpace/zhihu-python-master/zhihu.py",
+		"/E/WorkSpace/Spider/server.py",
+		"/E/WorkSpace/django_web/server.py",
+		"/E/WorkSpace/XXEngine/src/main.lua",
+		"/E/WorkSpace/XXEngine/src/cocos/init.lua",
+		"/E/WorkSpace/XXEngine/src/cocos/ui/GuiConstants.lua",
+		"/E/WorkSpace/XXEngine/src/cocos/cocos2d/Cocos2d.lua",
+		"/E/WorkSpace/XXEngine/src/cocos/framework/display.lua",
+		"/E/WorkSpace/XXEngine/src/app/views/MainScene.lua",
+		"/E/WorkSpace/XXEngine/src/cocos/cocos2d/functions.lua",
+		"/E/WorkSpace/XXEngine/run.bat",
+		"/C/Users/rwx/AppData/Roaming/Sublime Text 3/Packages/User/XXEngine.sublime-build",
+		"/C/Users/rwx/Desktop/src/app/utils/Utils.lua",
+		"/C/Users/rwx/Desktop/src/gameMain.lua",
+		"/C/Users/rwx/Desktop/src/framework/debug.lua",
+		"/C/Users/rwx/Desktop/src/framework/functions.lua",
+		"/C/Users/rwx/AppData/Roaming/Sublime Text 3/Packages/User/Localization.sublime-settings",
+		"/C/Users/rwx/Desktop/DIII.lua"
+	],
+	"find":
+	{
+		"height": 41.0
+	},
+	"find_in_files":
+	{
+		"height": 105.0,
+		"where_history":
+		[
+			"E:\\CocosCreator\\resources\\engine,*.js",
+			"E:\\Git\\BeeWar\\assets\\script",
+			"E:\\WorkSpace\\tutorial-blackjack-master\\assets,*.js",
+			"E:\\WorkSpace\\XXEngine\\src",
+			"C:\\Users\\rwx\\Desktop\\src",
+			"C:\\Users\\rwx\\Desktop\\src\\framework"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": true,
+		"find_history":
+		[
+			"checkChess",
+			"selectChess",
+			"checkChess",
+			"txtStep",
+			"AP",
+			"getPlayer",
+			"1",
+			"name",
+			"this.status",
+			"roundStart",
+			"}\n",
+			"banChess",
+			"moveChess",
+			"canMove",
+			"choiceChess",
+			"checkStatus",
+			"checkPoint",
+			"placeId",
+			"pfPoint",
+			"pfChess",
+			"Chess",
+			"AP",
+			"LayerManager",
+			"100",
+			"GameLogic",
+			"GameManager",
+			")\n",
+			"playGame",
+			"fetchFriendData",
+			"CC_WECHATGAME",
+			"_updateSubDomainCanvas",
+			"sharedCanvas",
+			"rankingScrollView",
+			"refreshBezier",
+			"_touchEndEvent",
+			"            \n",
+			"ctx",
+			"attack",
+			"speedX",
+			")\n",
+			"getBeeMoveTime",
+			"BoxCollider",
+			"Normal",
+			"belletSpeed",
+			"belletSpeedY",
+			"belletSpeed",
+			"speedX",
+			"updateTouch",
+			"movePlayer",
+			"playerMove",
+			"move",
+			"isPixel",
+			"isPoint",
+			"speedX",
+			"bulletNodePoint",
+			"getMoveTime",
+			"gap",
+			"fire",
+			"speed",
+			"angle",
+			"mul",
+			"fire",
+			"beeSpeed",
+			"pos",
+			"path",
+			"cc.p(",
+			"this.node",
+			"this",
+			"getMoveTime",
+			"mog",
+			"},\n",
+			"mog",
+			"beeSpeed",
+			"mPlayer",
+			"m_firstPos",
+			"        \n",
+			"hit",
+			"ATK",
+			"m_type",
+			"ndoe",
+			"radioButtonClicked",
+			"initUI",
+			"startNode",
+			"startPoint",
+			"movePlayer",
+			"startFire",
+			"game_type",
+			"this.Player",
+			"Player",
+			"getMoveTime",
+			"fire",
+			"downAndAtk",
+			"fire",
+			",\n",
+			"m_player",
+			"atkPlayer",
+			"move",
+			"beeRowList.length",
+			"            \n",
+			"update",
+			"_delay",
+			"stopTime",
+			"this.delay",
+			"startFire",
+			"speedX",
+			"            \n",
+			"btnLeft",
+			"setPlayerPoint",
+			"mode",
+			"registTouch",
+			"clear",
+			"resetBee",
+			"starGame",
+			"restart",
+			"resetGame",
+			"restart",
+			"resetGame",
+			"GameOver",
+			"enabled",
+			"GameOver",
+			"GameWin",
+			"Fire",
+			"fire",
+			"Fire",
+			"fire",
+			"bossAtk",
+			"reFightRotation",
+			"lookLock"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"enemy",
+			"s",
+			"y",
+			"x",
+			"y1",
+			"x1",
+			"y0",
+			"x0"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": true,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "assets/Scripts/GameLayer.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5444,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3329,
+								3329
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1746.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		},
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 1,
+					"file": "assets/Scripts/GameLogic.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3525,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3476,
+								3476
+							]
+						],
+						"settings":
+						{
+							"history_list_is_closing": true,
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1595.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "assets/Scripts/Player.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1044,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								171,
+								178
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "assets/Scripts/Chess.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1283,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1142,
+								1142
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 108.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 27.0
+	},
+	"input":
+	{
+		"height": 40.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.48667474258,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.doc":
+	{
+		"height": 0.0
+	},
+	"output.exec":
+	{
+		"height": 41.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "Packages/User/JavaSript.sublime-build",
+	"project": "ThreeChess.sublime-project",
+	"replace":
+	{
+		"height": 50.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"chess.js",
+				"ThreeChess\\assets\\Scripts\\Chess.js"
+			],
+			[
+				"gamelogic",
+				"ThreeChess\\assets\\Scripts\\GameLogic.js"
+			],
+			[
+				"global",
+				"ThreeChess\\assets\\Libs\\Global.js"
+			],
+			[
+				"GameLayer",
+				"ThreeChess\\assets\\Scripts\\GameLayer.js"
+			],
+			[
+				"gameoption",
+				"BeeWar\\assets\\script\\GameOption.js"
+			],
+			[
+				"Gamemanager",
+				"BeeWar\\assets\\script\\mgr\\GameManager.js"
+			],
+			[
+				"player",
+				"BeeWar\\assets\\script\\components\\Player.js"
+			],
+			[
+				"enemy.js",
+				"BeeWar\\assets\\script\\components\\Enemy.js"
+			],
+			[
+				"mainview",
+				"BeeWar\\assets\\script\\MainView.js"
+			],
+			[
+				"gameco",
+				"BeeWar\\assets\\script\\GameControl.js"
+			],
+			[
+				"gamema",
+				"BeeWar\\assets\\script\\mgr\\GameManager.js"
+			],
+			[
+				"gameui",
+				"BeeWar\\assets\\script\\GameUI.js"
+			],
+			[
+				"joyst",
+				"BeeWar\\assets\\script\\components\\Joystick.js"
+			],
+			[
+				"joystick",
+				"BeeWar\\assets\\prefab\\Joystick.prefab"
+			],
+			[
+				"gamemanager",
+				"BeeWar\\assets\\script\\mgr\\GameManager.js"
+			],
+			[
+				"Joystick",
+				"BeeWar\\assets\\script\\components\\Joystick.js"
+			],
+			[
+				"x",
+				"BeeWar\\assets\\script\\components\\XButton.js"
+			],
+			[
+				"ccvec2",
+				"engine\\cocos2d\\core\\value-types\\CCVec2.js"
+			],
+			[
+				"bellet.js",
+				"BeeWar\\assets\\script\\components\\Bullet.js"
+			],
+			[
+				"joy",
+				"BeeWar\\assets\\script\\components\\Joystick.js"
+			],
+			[
+				"gamelogic.js",
+				"BeeWar\\assets\\script\\GameLogic.js"
+			],
+			[
+				"CONST",
+				"BeeWar\\assets\\script\\util\\Constants.js"
+			],
+			[
+				"player.js",
+				"BeeWar\\assets\\script\\components\\Player.js"
+			],
+			[
+				"bullet.js",
+				"BeeWar\\assets\\script\\components\\Bullet.js"
+			],
+			[
+				"XBU",
+				"BeeWar\\assets\\script\\XButton.js"
+			],
+			[
+				"defaulscr",
+				"BeeWar\\assets\\script\\DefaulScript.js"
+			],
+			[
+				"corelogic",
+				"BeeWar\\assets\\script\\CoreLogic.js"
+			],
+			[
+				"gamemana",
+				"BeeWar\\assets\\script\\GameManager.js"
+			],
+			[
+				"defaul",
+				"BeeWar\\assets\\default\\DefaulScript.js"
+			],
+			[
+				"gol",
+				"BeeWar\\assets\\script\\util\\Global.js"
+			],
+			[
+				"BULLET",
+				"BeeWar\\assets\\script\\Bullet.js"
+			],
+			[
+				"CORELOGIC",
+				"BeeWar\\assets\\script\\CoreLogic.js"
+			],
+			[
+				"CCSCHEDULER",
+				"engine\\cocos2d\\core\\CCScheduler.js"
+			],
+			[
+				"enemy",
+				"BeeWar\\assets\\script\\Enemy.js"
+			],
+			[
+				"bullet",
+				"BeeWar\\assets\\script\\Bullet.js"
+			],
+			[
+				"PLAYER.JS",
+				"BeeWar\\assets\\script\\Player.js"
+			],
+			[
+				"gamein",
+				"BeeWar\\assets\\script\\GameWin.js"
+			],
+			[
+				"gameover",
+				"BeeWar\\assets\\script\\GameOver.js"
+			],
+			[
+				"gamewin",
+				"BeeWar\\assets\\script\\GameWin.js"
+			],
+			[
+				"con",
+				"BeeWar\\assets\\script\\util\\Constants.js"
+			],
+			[
+				"COMP",
+				"engine\\cocos2d\\core\\component-scheduler.js"
+			],
+			[
+				"base-node",
+				"engine\\cocos2d\\core\\utils\\base-node.js"
+			],
+			[
+				"ccnode",
+				"engine\\cocos2d\\core\\CCNode.js"
+			],
+			[
+				"GL",
+				"BeeWar\\assets\\script\\util\\Global.js"
+			],
+			[
+				"defaulscrip",
+				"BeeWar\\assets\\default\\DefaulScript.js"
+			],
+			[
+				"forma",
+				"BeeWar\\assets\\table\\formation.js"
+			],
+			[
+				"BULLET.JS",
+				"BeeWar\\assets\\script\\Bullet.js"
+			],
+			[
+				"GuiConstants",
+				"cocos\\ui\\GuiConstants.lua"
+			],
+			[
+				"DISPLAY",
+				"cocos\\framework\\display.lua"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 592.0
+	},
+	"selected_group": 1,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 269.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

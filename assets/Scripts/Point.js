@@ -12,35 +12,31 @@ cc.Class({
     extends: cc.Component,
 
     properties: {
-        frames:{
-            default:[],
-            type:cc.SpriteFrame
-        }
-    },
-    ctor(){
-        this.id = 0 // 棋子序号
-        this.playerId = 0
-        this.pointId = 0
-        this.status = 1 //0死了，1活着
+        txt:cc.Label,
     },
 
-    setPlayer(playerId,id,txtId){
+    // LIFE-CYCLE CALLBACKS:
+
+    // onLoad () {},
+
+    start () {
+        let ctx = this.node.getComponent(cc.Graphics)
+        ctx.moveTo(0,0)
+        ctx.circle(this.node.width/2,this.node.height/2,this.node.width/2)
+        ctx.stroke()
+    },
+    init(id){
         this.id = id
-        this.playerId = playerId
-        this.getComponent(cc.Sprite).spriteFrame = this.frames[txtId]
+        this.txt.string=id
     },
-    put(pId){
-        this.pointId= pId
+    onClick(cb,target){
+        this.cb=xx.utils.handler(cb,target)
     },
-    die(){
-        this.status = 1
+    clickEvent(){
+        if(this.cb){
+            this.cb(this)
+        }
     },
-    isDie(){
-        return this.status==0
-    },
-    isOnePlayer(chess){
-        return chess.playerId==this.playerId
-    }
 
     // update (dt) {},
 });
