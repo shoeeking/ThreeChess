@@ -28,20 +28,20 @@ cc.Class({
         this.choiceChess = null
     },
     onLoad () {
+        let data = {"A":[{"pointId":1,"alive":true},{"pointId":5,"alive":true},{"pointId":14,"alive":true},{"pointId":23,"alive":true}],"B":[{"pointId":2,"alive":true},{"pointId":8,"alive":false},{"pointId":7,"alive":true}],"step":8}     
         this.initPoints()
-        this.initPlayer()
-        this.roundStart()
+        this.initPlayer(this.AP,"A",data.A)
+        this.initPlayer(this.BP,"B",data.B)
+        this.roundStart(data.step)
     },
     initPoints(){
         let points = xx.gm.getPoints()
         for (var i = 0; i < points.length; i++) {
             let point = points[i]
-            let p = cc.p(-95*(point.rectId+1),95*(point.rectId+1))
-            let o = cc.p(95*(point.rectId+1),95*(point.rectId+1))
             let node = cc.instantiate(this.pfPoint)
-            node.position = cc.p(p.x+point.columnId*o.x,p.y-point.rowId*o.y)
+            node.position = this.getPointById(point)
             let script = node.getComponent("Point")
-            script.init(point.id)
+            script.init(point.pointId)
             script.onClick(this.pointEvent,this)
             this.node.addChild(node)
             if(point.columnId==1&&point.rowId==1){
@@ -49,9 +49,27 @@ cc.Class({
             }
         }
     },
-    initPlayer(){
-        this.AP.init("A")
-        this.BP.init("B")
+    initPlayer(player,info,chessList){
+        chessList = chessList || []
+
+        player.init(info)
+        for (var i = 0; i < chessList.length; i++) {
+            let data = chessList[i]
+            let chess = player.newChess(data.pointId)
+            chess.position = this.getPointById(data.pointId)
+            if(!data.alive){
+                player.remove(data.pointId)
+            }
+            this.node.addChild(chess)
+        }
+    },
+    getPointById(point){
+        if(typeof point == "number"){
+            point = xx.gm.getPoint(point)
+        }
+        let p = cc.p(-95*(point.rectId+1),95*(point.rectId+1))
+        let o = cc.p(95*(point.rectId+1),95*(point.rectId+1))
+        return cc.p(p.x+point.columnId*o.x,p.y-point.rowId*o.y)
     },
     getPlayer(isEmeny){
         let isA = this.isAStep()
@@ -64,71 +82,75 @@ cc.Class({
 
     pointEvent(target){
         if(this.status==GS.PUT){
-            this.putChess(target.node.position,target.id)
+            this.putChess(target.node.position,target.pointId)
         }else if(this.status==GS.MOVE){
-            this.moveChess(target.node.position,target.id)
+            this.moveChess(target.node.position,target.pointId)
         }else if(this.status==GS.BAN){
-            this.banChess(target.id)
+            this.banChess(target.pointId)
         }
     },
     //落子
-    putChess(point,id){
-        if(xx.gm.getChess(id)){
+    putChess(point,pointId){
+        if(xx.gm.getChess(pointId)){
             console.log("哪里有棋子")
             return
         }
+        if(xx.gm.isHotPoint(pointId)){
+            console.log("哪里是热窝,不能下")
+            return
+        }
         let player = this.getPlayer()
-        let chess = player.newChess(id)
+        let chess = player.newChess(pointId)
         chess.position = point
         this.node.addChild(chess)
 
         this.checkBan(chess)
     },
     //移子
-    moveChess(point,id){
+    moveChess(point,pointId){
         // 选子
         if(!this.choiceChess){
-            this.selectChess(id)
+            this.selectChess(pointId)
             return
         }
         //换子
-        if(this.changeChess(id)){
+        if(this.changeChess(pointId)){
             return
         }
-        if(!xx.gm.canMove(this.choiceChess,id)){
+        if(!xx.gm.canMove(this.choiceChess,pointId)){
             console.log("目标点不能以")
             return
         }
         let player = this.getPlayer()
-        player.move(id,this.choiceChess)
+        player.move(pointId,this.choiceChess)
         let chess = this.choiceChess
         chess.node.position = point
         this.choiceChess = null
 
         this.checkBan(chess)
     },
-    selectChess(id){
-        let chess = xx.gm.getChess(id)
+    selectChess(pointId){
+        let chess = xx.gm.getChess(pointId)
         if(!chess){
             console.log("移子，但是选择的是空子")
             return null
         }
         let player = this.getPlayer()
-        if(chess.playerId!=player.id){
+        if(!player.isMe(chess.playerId)){
             console.log("选的不是一边的棋子")
             return null
         }
         this.choiceChess = chess
         return chess
     },
-    changeChess(id){
-        if(this.choiceChess.pointId==id){
+    changeChess(pointId){
+        if(this.choiceChess.pointId==pointId){
             console.log("换的是同一个子")
             return false
         }
         let player = this.getPlayer()
-        let chess = xx.gm.getChess(id)
-        if(chess&&chess.playerId==player.id){
+        let chess = xx.gm.getChess(pointId)
+        if(chess&&player.isMe(chess.playerId)){
             this.choiceChess = chess
             return true
         }
@@ -144,9 +166,23 @@ cc.Class({
         this.setStatus(GS.BAN)
         return true
     },
-    banChess(id){
+    banChess(pointId){
         let player = this.getPlayer(true)
-        if(player.remove(id)){
+        let chess = xx.gm.getChess(pointId)
+        if(!chess){
+            console.log("不能拿空子")
+            return false
+        }
+        if(!player.isMe(chess.playerId)){
+            console.log("不能拿自己的棋子")
+            return false
+        }
+        if(!player.canRemove(pointId)){
+            console.log("不能拿别人的成三子")
+            return
+        }
+
+        if(player.remove(pointId)){
             this.banNum--
         }
 
@@ -161,7 +197,8 @@ cc.Class({
         return three.length
     },
     checkNormalStatus(){
-        if(this.stepIndex<=18){
+        let player = this.getPlayer()
+        if(!player.isPutOver()){
             this.setStatus(GS.PUT)
         }else{
             this.setStatus(GS.MOVE)
@@ -192,8 +229,8 @@ cc.Class({
         }
     },
 
-    roundStart(){
-        this.stepIndex = 1
+    roundStart(step){
+        this.stepIndex = step || 1
         this.setStatus(GS.PUT)
     },
     nextStep(){
@@ -209,5 +246,12 @@ cc.Class({
     update (dt) {
         this.aFlag.string = this.AP.alive+"/"+this.AP.chesses.length
         this.bFlag.string = this.BP.alive+"/"+this.BP.chesses.length
+    },
+    printEvent(){
+        let data = {}
+        data.A = this.AP.log()
+        data.B = this.BP.log()
+        data.step = this.stepIndex
+        console.log(JSON.stringify(data))
     },
 });
