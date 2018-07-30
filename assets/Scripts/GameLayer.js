@@ -1,5 +1,6 @@
 let GameManager = require("GameLogic")
 let Player = require("Player")
+let FightAI = require("FightAI")
 
 let GS = cc.Enum({
     IDLE:-1,//待机
@@ -18,6 +19,7 @@ cc.Class({
         AP:Player,
         BP:Player,
         txtStatus:cc.Label,
+        BAI:FightAI,
     },
     ctor(){
         if(!xx.gm){
@@ -55,10 +57,10 @@ cc.Class({
         player.init(info)
         for (var i = 0; i < chessList.length; i++) {
             let data = chessList[i]
-            let chess = player.newChess(data.pointId)
+            let chess = player.putChess(data.pointId)
             chess.position = this.getPointById(data.pointId)
             if(!data.alive){
-                player.remove(data.pointId)
+                player.removeChess(data.pointId)
             }
             this.node.addChild(chess)
         }
@@ -100,7 +102,7 @@ cc.Class({
             return
         }
         let player = this.getPlayer()
-        let chess = player.newChess(pointId)
+        let chess = player.putChess(pointId)
         chess.position = point
         this.node.addChild(chess)
 
@@ -122,7 +124,7 @@ cc.Class({
             return
         }
         let player = this.getPlayer()
-        player.move(pointId,this.choiceChess)
+        player.moveChess(pointId,this.choiceChess)
         let chess = this.choiceChess
         chess.node.position = point
         this.choiceChess = null
@@ -182,7 +184,7 @@ cc.Class({
             return
         }
 
-        if(player.remove(pointId)){
+        if(player.removeChess(pointId)){
             this.banNum--
         }
 
@@ -244,14 +246,15 @@ cc.Class({
         this.checkNormalStatus()
     },
     update (dt) {
-        this.aFlag.string = this.AP.alive+"/"+this.AP.chesses.length
-        this.bFlag.string = this.BP.alive+"/"+this.BP.chesses.length
+        this.aFlag.string = this.AP.alive+"/"+this.AP.chessList.length
+        this.bFlag.string = this.BP.alive+"/"+this.BP.chessList.length
     },
     printEvent(){
-        let data = {}
-        data.A = this.AP.log()
-        data.B = this.BP.log()
-        data.step = this.stepIndex
-        console.log(JSON.stringify(data))
+        // let data = {}
+        // data.A = this.AP.log()
+        // data.B = this.BP.log()
+        // data.step = this.stepIndex
+        // console.log(JSON.stringify(data))
+        this.BAI.AI()
     },
 });

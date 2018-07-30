@@ -8,27 +8,26 @@ cc.Class({
     },
     ctor(){
         this.playerId = 0
-        this.chesses = []
-        this.chessIndex = 0
+        this.chessList = []
         this.alive = 0
     },
     init(playerId){
         this.playerId= playerId
-        this.chesses = []
+        this.chessList = []
     },
-    newChess(pointId){
+    putChess(pointId){
         let chess = cc.instantiate(this.pfChess)
         let script = chess.getComponent('Chess')
-        script.setPlayer(this.playerId,this.chessIndex++,this.flag)
+        script.setPlayer(this.playerId,this.chessList.length,this.flag)
         xx.gm.put(pointId,script)
-        this.chesses.push(chess)
+        this.chessList.push(chess)
         this.alive++
         return chess
     },
-    move(pointId,chess){
+    moveChess(pointId,chess){
         xx.gm.move(pointId,chess)
     },
-    remove(pointId){
+    removeChess(pointId){
         let chess = xx.gm.getChess(pointId)
         xx.gm.remove(chess)
         this.alive--
@@ -38,13 +37,13 @@ cc.Class({
         return this.isAllDie()||this.isNoWay()
     },
     isAllDie(){
-        if(this.chesses.length<9)return false
+        if(this.chessList.length<9)return false
         return this.alive<3
     },
     isNoWay(){
-        if(this.chesses.length<9)return false
-        for (var i = 0; i < this.chesses.length; i++) {
-            let chess = this.chesses[i].getComponent("Chess")
+        if(this.chessList.length<9)return false
+        for (var i = 0; i < this.chessList.length; i++) {
+            let chess = this.chessList[i].getComponent("Chess")
             if(!chess.isDie()&&xx.gm.getWay(chess.pointId).length>0){
                 return false
             }
@@ -52,15 +51,15 @@ cc.Class({
         return true
     },
     isPutOver(){
-        return this.chesses.length>=9
+        return this.chessList.length>=9
     },
     isMe(playerId){
         return this.playerId==playerId
     },
     log(){
         let info = []
-        for (var i = 0; i < this.chesses.length; i++) {
-            let chess = this.chesses[i].getComponent("Chess")
+        for (var i = 0; i < this.chessList.length; i++) {
+            let chess = this.chessList[i].getComponent("Chess")
             info.push({pointId:chess.pointId,alive:!chess.isDie()})
         }
         return info
@@ -86,8 +85,8 @@ cc.Class({
         }
         let list = concatArray(threeList)
 
-        for (var i = 0; i < this.chesses.length; i++) {
-            let script = this.chesses[i].getComponent("Chess")
+        for (var i = 0; i < this.chessList.length; i++) {
+            let script = this.chessList[i].getComponent("Chess")
             if(script.isDie())continue;
             if(list.indexOf(script.pointId)>-1)continue;
             let tlist = xx.gm.getThree(script)

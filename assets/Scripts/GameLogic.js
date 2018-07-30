@@ -3,6 +3,7 @@
 let GameLogic = cc.Class({
     ctor(){
         this.pointList = []
+        this.keyPointList = {}
         for(var i=0;i<3;i++){
             for(var j=0;j<9;j++){
                 let point = {}
@@ -11,7 +12,12 @@ let GameLogic = cc.Class({
                 point.placeId = j
                 point.rowId = Math.floor(j/3)
                 point.columnId = Math.floor(j%3)
+                point.x = (point.columnId-1)*(i+1)
+                point.y = (point.rowId-1)*(i+1)
                 this.pointList[point.pointId] = point
+                
+                if(point.x==0&&point.y==0)continue;
+                this.keyPointList[point.x+"_"+point.y] = point
             }
         }
         this.chessList = []
@@ -19,6 +25,11 @@ let GameLogic = cc.Class({
     getPoint(pointId){
         return this.pointList[pointId]
     },
+    getPointByKey(p){
+        let key = p.x+"_"+p.y
+        return this,keyPointList[key]
+    },
+
     getPoints(){
         return this.pointList
     },
